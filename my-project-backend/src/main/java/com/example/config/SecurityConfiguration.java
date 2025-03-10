@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -135,8 +136,15 @@ public class SecurityConfiguration {
         String authorization = request.getHeader("Authorization");
         if(utils.invalidateJwt(authorization)) {
             writer.write(RestBean.success("退出登录成功").asJsonString());
+            securityContextLogoutHandler().logout(request, response, authentication);
             return;
         }
         writer.write(RestBean.failure(400, "退出登录失败").asJsonString());
     }
+
+    @Bean
+    public SecurityContextLogoutHandler securityContextLogoutHandler() {
+        return new SecurityContextLogoutHandler();
+    }
+
 }
